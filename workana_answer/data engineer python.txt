@@ -1,0 +1,64 @@
+
+1. 
+
+SELECT 'customer' AS type, c.id AS customer_id, c.customer_name
+FROM customer c
+LEFT JOIN invoice i ON c.id = i.customer_id
+WHERE i.id IS NULL
+
+UNION
+
+SELECT 'product' AS type, p.id AS product_id, p.product_name
+FROM product p
+LEFT JOIN invoice_item ii ON p.id = ii.product_id
+WHERE ii.id IS NULL;
+
+2. 
+
+Use FileInputFormat.addInputPaths(). Example: `FileInputFormat.addInputPaths("/user/hadoop/logs/2017/log.log,/user/hadoop/logs/2018/log.log")`
+
+3. 
+def stemmer(text):
+    stemmed_text = []
+    words = text.split()
+    for word in words:
+        if word.endswith('ed') or word.endswith('ly'):
+            word = word[:-2]  # Remove the suffix
+        elif word.endswith('ing'):
+            word = word[:-3]
+        if len(word) > 8:
+            word = word[:8]  # Keep the first 8 letters
+        stemmed_text.append(word)
+    return ' '.join(stemmed_text)
+4.
+
+from pyspark.sql import SparkSession, DataFrame
+import pyspark.sql.functions as F
+from pyspark.sql.window import Window
+from main.base import PySparkJobInterface
+
+class PySparkJob(PySparkJobInterface):
+
+    def init_spark_session(self) -> SparkSession:
+        spark = SparkSession.builder.master("local").appName("Banking Data Mining").getOrCreate()
+        return spark
+
+    def extract_valid_transactions(self, accounts: DataFrame, transactions: DataFrame) -> DataFrame:
+        valid_transactions = transactions.join(accounts, transactions.toAccountNumber == accounts.accountNumber, "inner") \
+            .filter(transactions.transferAmount <= accounts.balance) \
+            .select(transactions.fromAccountNumber, transactions.toAccountNumber, transactions.transferAmount)
+        return valid_transactions
+
+    def distinct_transactions(self, transactions: DataFrame) -> int:
+        distinct_transactions = transactions.select("fromAccountNumber").distinct().count()
+        return distinct_transactions
+
+    def transactions_per_account(self, transactions: DataFrame) -> dict:
+        window = Window.partitionBy(transactions.fromAccountNumber)
+        transactions_per_account = transactions.withColumn("transactionCount", F.count("*").over(window)) \
+            .select("fromAccountNumber", "transactionCount") \
+            .distinct() \
+            .orderBy(F.desc("transactionCount")) \
+            .limit(10) \
+            .toPandas().set_index("fromAccountNumber").to_dict()["transactionCount"]
+        return transactions_per_account

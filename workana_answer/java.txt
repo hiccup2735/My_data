@@ -1,0 +1,88 @@
+- Furniture.java 
+package hackerrank;
+
+public enum Furniture {
+    CHAIR("Chair", 100.0f),
+    TABLE("Table", 250.0f),
+    COUCH("Couch", 500.0f);
+
+    private String label;
+    private float cost;
+
+    Furniture(String label, float cost) {
+        this.label = label;
+        this.cost = cost;
+    }
+
+    public String label() {
+        return label;
+    }
+
+    public float cost() {
+        return cost;
+    }
+}
+
+-FurnitureOrderInterface.java
+package hackerrank;
+
+import java.util.HashMap;
+
+public interface FurnitureOrderInterface {
+    void addToOrder(final Furniture type, final int count);
+
+    HashMap<Furniture, Integer> getOrderedFurniture();
+
+    int getTypeCount(Furniture type);
+
+    float getTypeCost(Furniture type);
+
+    float getTotalOrderCost();
+
+    int getTotalOrderQuantity();
+}
+
+- FurnitureOrder.java
+package hackerrank;
+
+import java.util.HashMap;
+
+public class FurnitureOrder implements FurnitureOrderInterface {
+    private HashMap<Furniture, Integer> order;
+
+    public FurnitureOrder() {
+        order = new HashMap<>();
+    }
+
+    public void addToOrder(final Furniture type, final int furnitureCount) {
+        order.put(type, order.getOrDefault(type, 0) + furnitureCount);
+    }
+
+    public HashMap<Furniture, Integer> getOrderedFurniture() {
+        return order;
+    }
+
+    public float getTotalOrderCost() {
+        float totalCost = 0.0f;
+        for (Furniture furniture : order.keySet()) {
+            totalCost += furniture.cost() * order.get(furniture);
+        }
+        return totalCost;
+    }
+
+    public int getTypeCount(Furniture type) {
+        return order.getOrDefault(type, 0);
+    }
+
+    public float getTypeCost(Furniture type) {
+        return type.cost() * getTypeCount(type);
+    }
+
+    public int getTotalOrderQuantity() {
+        int totalQuantity = 0;
+        for (int quantity : order.values()) {
+            totalQuantity += quantity;
+        }
+        return totalQuantity;
+    }
+}

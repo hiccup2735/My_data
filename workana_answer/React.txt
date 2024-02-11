@@ -1,0 +1,123 @@
+PasswordChecker.js:
+
+import React, { useState } from "react";
+import PasswordStrength from "./PasswordStrength";
+
+const PasswordChecker = () => {
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [strength, setStrength] = useState(0);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    checkPasswordStrength(value);
+  };
+
+  const checkPasswordStrength = (value) => {
+    if (
+      value.length >= 8 &&
+      /[a-z]/.test(value) &&
+      /[A-Z]/.test(value) &&
+      /[0-9]/.test(value) &&
+      /[$#&_]/.test(value)
+    ) {
+      setStrength(2);
+    } else if (
+      value.length >= 8 &&
+      /[a-z]/.test(value) &&
+      /[A-Z]/.test(value) &&
+      /[0-9]/.test(value)
+    ) {
+      setStrength(1);
+    } else {
+      setStrength(0);
+    }
+  };
+
+  const handleShowClick = () => {
+    setShow(!show);
+  };
+
+  const handleClearClick = () => {
+    setStrength(0);
+    setPassword("");
+  };
+
+  return (
+    <div className="layout-column align-items-center justify-content-center py-40 mt-100">
+      <div className="card w-50 px-75 py-30">
+        <form onSubmit={(e) => e.preventDefault()}>
+          <h2>Enter Your Password</h2>
+          <div className="layout-column mb-10">
+            <input
+              type={show ? "text" : "password"}
+              id="name"
+              placeholder="Enter Password"
+              data-testid="passwordInput"
+              value={password}
+              onChange={handleChange}
+            />
+          </div>
+        </form>
+        <div className="py-10" data-testid="buttonDiv">
+          <button onClick={handleShowClick}>
+            {show ? "Hide Password" : "Show Password"}
+          </button>
+          <button onClick={handleClearClick}>Clear Password</button>
+        </div>
+      </div>
+      <div className="w-50 py-20">
+        <PasswordStrength strength={strength} />
+      </div>
+    </div>
+  );
+};
+
+export default PasswordChecker;
+
+- PasswordStrength.js:
+
+import React, { useEffect, useState } from "react";
+
+const PasswordStrength = (props) => {
+  const strength = props.strength;
+  const [text, setText] = useState("");
+  const [color, setColor] = useState("");
+
+  useEffect(() => {
+    if (strength === 0) {
+      setText("Weak Password");
+      setColor("red");
+    } else if (strength === 1) {
+      setText("Moderate Password");
+      setColor("orange");
+    } else if (strength === 2) {
+      setText("Strong Password");
+      setColor("green");
+    }
+  }, [strength]);
+
+  return (
+    <div
+      className="px-5 py-5"
+      style={{
+        backgroundColor: color,
+      }}
+      data-testid="passwordStrengthDiv"
+    >
+      <h4
+        style={{
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        {text}
+      </h4>
+    </div>
+  );
+};
+
+export default PasswordStrength;
+
+

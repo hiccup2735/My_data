@@ -1,0 +1,47 @@
+- middleware.js
+
+const VALID_KEYS_PATH = __dirname + '/valid-keys.txt';
+const fs = require('fs')
+
+module.exports = function (req, res, next) {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey) {
+    res.sendStatus(401);
+  } else {
+    fs.readFile(VALID_KEYS_PATH, 'utf8', (err, data) => {
+      if(err) {
+        res.sendStatus(401);
+      } else {
+        const validKeys = data.split('\n').filter(key => key.trim() !== '');
+        if (validKeys.includes(apiKey)) {
+          next();
+        } else {
+          res.sendStatus(401);
+        }
+      }
+    });
+  }
+};
+
+
+- key-store.js
+
+const VALID_KEYS_PATH = __dirname + '/valid-keys.txt';
+const fs = require('fs');
+const shortid = require('shortid');
+// To generate a unique API KEY, use shortid.generate()
+const LINE_ENDING = require('os').EOL;
+
+module.exports = function (req, res) {
+  const newApiKey = shortid.generate();
+
+  fs.appendFile(VALID_KEYS_PATH, newApiKey + LINE_ENDING, (err) => {
+    if (err) {
+      res.sendStatus(500);
+    } else {
+      res.status(201).json({ apiKey: newApiKey });
+    }
+  });
+
+};
+

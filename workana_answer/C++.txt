@@ -1,0 +1,201 @@
+1.
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Grade {
+public:
+    string subject_name;
+    char grade;
+};
+
+class Student {
+public:
+    int student_id;
+    string student_name;
+    vector<Grade> grades;
+};
+
+int main() {
+    int student_id;
+    string student_name;
+    cin >> student_id >> student_name;
+
+    int subjectsCount;
+    cin >> subjectsCount;
+
+    vector<Grade> grades;
+    while(subjectsCount--){
+        string subject_name;
+        char grade;
+        cin >> subject_name >> grade;
+
+        Grade g = {subject_name, grade};
+        grades.push_back(g);
+    }
+
+    Student s = {student_id, student_name, grades};
+    
+    cout << s.student_id << " " << s.student_name << endl;
+    for(vector<Grade>::size_type i=0; i < s.grades.size(); i++) {
+        Grade grade=s.grades[i];
+        cout << grade.subject_name << " " << grade.grade << endl;
+    }
+    
+    return 0;
+}
+
+2.
+#include<stdio.h>
+#include<stdlib.h>
+
+struct abc {
+  int value;
+  int* ptr;
+};
+
+void Nullify_Min(int** a, int** b) {
+    // YOUR CODE HERE
+}
+
+int find_Maximum(int a, int b) {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+void swap(int* a, int* b) {
+    // YOUR CODE HERE
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main() {
+    struct abc obj1;
+    struct abc obj2;
+
+    obj1.ptr = &obj1.value;
+    obj2.ptr = &obj2.value;
+
+    scanf("%d", &obj1.value);
+    scanf("%d", &obj2.value);
+
+    swap(obj1.ptr, obj2.ptr);
+
+    int check = find_Maximum(obj1.value, obj2.value);
+    if (check == obj1.value) {
+        printf("OBJ1 : %d", check);
+    } else {
+        printf("OBJ2 : %d", check);
+    }
+
+    Nullify_Min(&obj1.ptr, &obj2.ptr);
+    printf("\n");
+    if (obj1.ptr == NULL && *obj2.ptr == check) {
+        printf("NULL");
+    } else if (obj2.ptr == NULL && *obj1.ptr == check) {
+        printf("NULL");
+    } else {
+        printf("NULL");
+    }
+
+    return 0;
+}
+
+
+3.
+#include <iostream>
+
+class Point
+{
+    int x, y, z;
+
+public:
+    friend std::ostream &operator<<(std::ostream &os, const Point &p);
+    friend std::istream &operator>>(std::istream &is, Point &p);
+};
+
+std::ostream &operator<<(std::ostream &os, const Point &p)
+{
+    os << p.x << " " << p.y << " " << p.z;
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, Point &p)
+{
+    is >> p.x >> p.y >> p.z;
+    return is;
+}
+
+class Rectangle
+{
+    int length, breadth;
+
+public:
+    friend std::ostream &operator<<(std::ostream &os, const Rectangle &r);
+    friend std::istream &operator>>(std::istream &is, Rectangle &r);
+};
+
+std::ostream &operator<<(std::ostream &os, const Rectangle &r)
+{
+    os << r.length << " " << r.breadth;
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, Rectangle &r)
+{
+    is >> r.length >> r.breadth;
+    return is;
+}
+
+class Triangle
+{
+    int base, height;
+
+public:
+    friend std::ostream &operator<<(std::ostream &os, const Triangle &t);
+    friend std::istream &operator>>(std::istream &is, Triangle &t);
+};
+
+std::ostream &operator<<(std::ostream &os, const Triangle &t)
+{
+    os << t.base << " " << t.height;
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, Triangle &t)
+{
+    is >> t.base >> t.height;
+    return is;
+}
+
+int main()
+{
+    Point p;
+    Triangle t;
+    Rectangle r;
+
+    std::cin >> p >> t >> r;
+    std::cout << p << " " << t << " " << r << std::endl;
+
+    std::cin >> p >> r >> t;
+    std::cout << p << " " << r << " " << t << std::endl;
+
+    std::cin >> r >> t >> p;
+    std::cout << r << " " << t << " " << p << std::endl;
+
+    std::cin >> r >> p >> t;
+    std::cout << r << " " << p << " " << t << std::endl;
+
+    std::cin >> t >> r >> p;
+    std::cout << t << " " << r << " " << p << std::endl;
+
+    std::cin >> t >> p >> r;
+    std::cout << t << " " << p << " " << r << std::endl;
+
+    return 0;
+}

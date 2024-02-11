@@ -1,0 +1,236 @@
+1.
+'use strict';
+import { WriteStream, createWriteStream } from "fs";
+
+process.stdin.resume();
+process.stdin.setEncoding('utf-8');
+
+let inputString: string = '';
+let inputLines: string[] = [];
+let currentLine: number = 0;
+
+process.stdin.on('data', function (inputStdin: string): void {
+    inputString += inputStdin;
+});
+
+process.stdin.on('end', function (): void {
+    inputLines = inputString.split('\n');
+    inputString = '';
+    main();
+});
+
+function readLine(): string {
+    return inputLines[currentLine++];
+}
+
+/*
+ * Complete the 'sortIntersect' function below.
+ *
+ * The function is expected to return an INTEGER_ARRAY.
+ * The function accepts following parameters:
+ *  1. INTEGER_ARRAY volcanic
+ *  2. INTEGER_ARRAY nonVolcanic
+ */
+function sortIntersect(volcanic: number[], nonVolcanic: number[]): number[] {
+    // Create a set of the non-volcanic dates.
+    const nonVolcanicSet: Set<number> = new Set(nonVolcanic);
+
+    // Filter the volcanic dates to only include those that are in the non-volcanic set.
+    const matches: number[] = volcanic.filter((date) => nonVolcanicSet.has(date));
+
+    // Create a set of the matches to remove duplicates.
+    const uniqueMatches: Set<number> = new Set(matches);
+
+    // Convert the set of unique matches back to an array.
+    const uniqueMatchesArray: number[] = Array.from(uniqueMatches);
+
+    // Sort the unique matches in descending order.
+    uniqueMatchesArray.sort((a, b) => b - a);
+
+    return uniqueMatchesArray;
+}
+
+function main() {
+    const ws: WriteStream = createWriteStream(process.env['OUTPUT_PATH']);
+
+    const volcanicCount: number = parseInt(readLine().trim(), 10);
+    let volcanic: number[] = [];
+    for (let i: number = 0; i < volcanicCount; i++) {
+        const volcanicItem: number = parseInt(readLine().trim(), 10);
+        volcanic.push(volcanicItem);
+    }
+
+    const nonVolcanicCount: number = parseInt(readLine().trim(), 10);
+    let nonVolcanic: number[] = [];
+    for (let i: number = 0; i < nonVolcanicCount; i++) {
+        const nonVolcanicItem: number = parseInt(readLine().trim(), 10);
+        nonVolcanic.push(nonVolcanicItem);
+    }
+
+    const result: number[] = sortIntersect(volcanic, nonVolcanic);
+
+    ws.write(result.join('\n') + '\n');
+    ws.end();
+}
+
+2.
+-- Create the CUSTOMER table
+CREATE TABLE CUSTOMER (
+  customer_id INT,
+  customer_name VARCHAR(100),
+  PRIMARY KEY (customer_id)
+);
+
+-- Insert sample data into CUSTOMER table
+INSERT INTO CUSTOMER (customer_id, customer_name)
+VALUES (1, 'John'),
+       (2, 'Jane');
+
+-- Create the PRODUCT table
+CREATE TABLE PRODUCT (
+  product_id INT,
+  category VARCHAR(100),
+  discount DECIMAL(10, 2),
+  PRIMARY KEY (product_id)
+);
+
+-- Insert sample data into PRODUCT table
+INSERT INTO PRODUCT (product_id, category, discount)
+VALUES (1, 'Electronics', 0.15),
+       (2, 'Electronics', 0.30),
+       (3, 'Clothing', 0.20),
+       (4, 'Clothing', 0.25);
+
+-- Create the PURCHASE table
+CREATE TABLE PURCHASE (
+  purchase_id INT,
+  customer_id INT,
+  product_id INT,
+  purchase_date DATE,
+  PRIMARY KEY (purchase_id),
+  FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id),
+  FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
+);
+
+-- Insert sample data into PURCHASE table
+INSERT INTO PURCHASE (purchase_id, customer_id, product_id, purchase_date)
+VALUES (1, 1, 1, '2021-01-01'),
+       (2, 1, 2, '2021-02-01'),
+       (3, 2, 3, '2021-03-01'),
+       (4, 2, 4, '2021-04-01');
+
+-- Query to retrieve the products with maximum discount in each category
+SELECT p.category, p.product_id, p.discount
+FROM PRODUCT p
+JOIN (
+  SELECT category, MAX(discount) AS max_discount
+  FROM PRODUCT
+  GROUP BY category
+) subq ON p.category = subq.category AND p.discount = subq.max_discount
+ORDER BY p.category ASC, p.product_id ASC;
+
+3.
+
+'use strict';
+import { WriteStream, createWriteStream } from "fs";
+
+process.stdin.resume();
+process.stdin.setEncoding('utf-8');
+
+let inputString: string = '';
+let inputLines: string[] = [];
+let currentLine: number = 0;
+
+process.stdin.on('data', function (inputStdin: string): void {
+    inputString += inputStdin;
+});
+
+process.stdin.on('end', function (): void {
+    inputLines = inputString.split('\n');
+    inputString = '';
+    main();
+});
+
+function readLine(): string {
+    return inputLines[currentLine++];
+}
+
+class Observe {
+    name: string;
+    args: any;
+    result: number;
+    getLastCall(): string {
+        return `${this.name} was called with arguments ${this.args["0"]}, ${this.args["1"]} and returned ${this.result}\n`;
+    }
+}
+
+const observeObj: Observe = new Observe();
+
+const add: Function = (function () {
+    var called: number = 0;
+    return function add(a: number, b: number): number {
+        if (called === 0) {
+            called++;
+            this.result = a + b;
+        }
+        return called;
+    }
+})();
+
+const power: Function = (function () {
+    var called: number = 0;
+    return function power(a: number, b: number): number {
+        if (called === 0) {
+            this.result = a ** b;
+            called++;
+        }
+        return called;
+    }
+})();
+
+/*
+ * Complete the 'observer' function below.
+ *
+ * The function is expected to return a FUNCTION.
+ */
+function observer(func: Function): Function {
+    return function (...args: any[]): number {
+        observeObj.name = func.name;
+        observeObj.args = args;
+        return func.apply(observeObj, args);
+    }
+}
+
+function main() {
+    const ws: WriteStream = createWriteStream(process.env['OUTPUT_PATH']);
+    const input = readLine().trim().split(' ');
+    const x: number = parseInt(input[0]);
+    const y: number = parseInt(input[1]);
+
+    let observePower: Function = observer(power);
+    observePower(x, y);
+
+    try {
+        power(1, 1);
+    } catch (err) {
+        ws.write("Please use the already defined functions.\n");
+        ws.end();
+        return;
+    }
+
+    ws.write(observeObj.getLastCall());
+
+    let observeAdd: Function = observer(add);
+    observeAdd(x, y);
+
+    try {
+        add(1, 1);
+    } catch (err) {
+        ws.write("Please use the already defined functions.\n");
+        ws.end();
+        return;
+    }
+
+    ws.write(observeObj.getLastCall());
+    ws.end();
+}

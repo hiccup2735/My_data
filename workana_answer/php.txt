@@ -1,0 +1,85 @@
+1. 100
+2. realpath()
+3. c
+4. 
+function calculateSum($data) {
+    $values = explode(';', $data);
+    return array_sum($values);
+}
+5. 
+<?php
+
+abstract class GenericTrap {
+    protected $isArmed = false;
+
+    final public function __construct(...$things) {
+        array_walk(
+            $things,
+            function ($thing, $place): void {
+                $this->{$place} = $thing;
+            }
+        );
+
+        $this->arm();
+    }
+
+    final protected function arm(): void {
+        $this->isArmed = true;
+    }
+
+    final public function disarm(): void {
+        $this->isArmed = false;
+    }
+
+    final public function isArmed(): bool {
+        return $this->isArmed;
+    }
+}
+
+class Trap extends GenericTrap {}
+
+abstract class AbstractTripFinder {
+    abstract static public function doSomething(GenericTrap $trap): int;
+}
+
+?>
+
+<?php
+
+class TrapFinder extends AbstractTripFinder {
+    static public function doSomething(GenericTrap $trap): int {
+        $trap->disarm();
+        $propertiseCount = count(get_object_vars($trap));
+        return $propertiseCount;
+    }
+}
+
+$fptr = fopen(getenv('OUTPUT_PATH'), 'w');
+
+$data = [];
+
+while ($_ = fgets(STDIN)) {
+  eval(sprintf('$data[] = %s;', trim($_)));
+}
+
+$trap = new Trap(
+    ...$data
+);
+
+$result = print_r(
+    [
+        'thingsCount' => TrapFinder::doSomething(
+            $trap
+        ),
+        'isArmed' => $trap->isArmed() ? 'true' : 'false'
+    ],
+    true
+);
+
+fwrite($fptr, $result);
+
+fclose($fptr);
+
+6. 
+- Local storage can be used to ...
+- Both the Fullscreen API ...

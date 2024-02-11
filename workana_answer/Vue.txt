@@ -1,0 +1,130 @@
+1. caption-side
+2. 2
+3. 2, 3
+4. 1
+5. 1, 3
+6. 4
+7. 
+
+<template>
+  <div>
+    <div class="canvas" :style="{ backgroundColor: selectedColor }" data-testid="selectedColor">
+      <p class="text-center mx-auto px-5">{{ selectedColor }}</p>
+    </div>
+    <div class="color-picker-options" data-testid="colorPickerOptions">
+      <div v-for="color in colorPickerOptions" :key="color" class="color-box mx-8 my-15" :style="{ backgroundColor: color }" @click="selectColor(color)"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ColorPicker",
+  props: {
+    colorPickerOptions: {
+      type: Array,
+      required: true
+    },
+    initialSelectedColor: {
+      type: String,
+      required: true
+    }
+  },
+  data() {
+    return {
+      selectedColor: this.initialSelectedColor
+    };
+  },
+  methods: {
+    selectColor(color) {
+      this.selectedColor = color;
+    }
+  }
+};
+</script>
+
+<style scoped>
+.canvas {
+  width: 100%;
+  height: 280px;
+  transition: background-color 0.3s ease-in-out;
+  position: relative;
+}
+
+.canvas p {
+  font-size: 0.8em;
+  position: absolute;
+  bottom: 4px;
+  width: 30%;
+  background: rgba(255, 255, 255, 0.6);
+  left: 35%;
+  font-style: italic;
+}
+
+.color-box {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  cursor: pointer;
+}
+
+.color-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid black;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  will-change: opacity;
+}
+
+.color-box.selected::after {
+  opacity: 1;
+}
+
+.divider {
+  color: rgba(0, 0, 0, 0.12);
+  display: block;
+  flex: 1 1 0px;
+  max-width: 100%;
+  height: 0px;
+  max-height: 0px;
+  border: solid;
+  border-width: thin 0 0 0;
+  transition: inherit;
+}
+</style>
+
+8. 
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Container styles */
+.images {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Image styles */
+.images img {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Media queries for mobile layout */
+@media (max-width: 768px) {
+  .images img {
+    width: 100%;
+    margin: 0 0 10px 0;
+  }
+}
